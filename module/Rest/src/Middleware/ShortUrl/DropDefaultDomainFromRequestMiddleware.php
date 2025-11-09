@@ -28,8 +28,12 @@ readonly class DropDefaultDomainFromRequestMiddleware implements MiddlewareInter
 
     private function sanitizeDomainFromPayload(array $payload): array
     {
-        if (isset($payload['domain']) && $payload['domain'] === $this->urlShortenerOptions->defaultDomain) {
-            unset($payload['domain']);
+        // if (isset($payload['domain']) && $payload['domain'] === $this->urlShortenerOptions->defaultDomain) {
+        //     unset($payload['domain']);
+        // }
+
+        if (!isset($payload['domain'])) {
+            $payload['domain'] = $this->urlShortenerOptions->defaultDomain;
         }
 
         return $payload;

@@ -11,6 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 use Happyr\DoctrineSpecification\Repository\EntitySpecificationRepository;
 use Happyr\DoctrineSpecification\Specification\Specification;
 use Shlinkio\Shlink\Common\Doctrine\Type\ChronosDateTimeType;
+use Shlinkio\Shlink\Core\Config\Options\UrlShortenerOptions;
 use Shlinkio\Shlink\Core\ShortUrl\Entity\ShortUrl;
 use Shlinkio\Shlink\Core\ShortUrl\Model\ShortUrlCreation;
 use Shlinkio\Shlink\Core\ShortUrl\Model\ShortUrlIdentifier;
@@ -23,6 +24,9 @@ use function strtolower;
 /** @extends EntitySpecificationRepository<ShortUrl> */
 class ShortUrlRepository extends EntitySpecificationRepository implements ShortUrlRepositoryInterface
 {
+    public function __construct(private UrlShortenerOptions $options) {
+    }
+
     public function findOneWithDomainFallback(ShortUrlIdentifier $identifier, ShortUrlMode $shortUrlMode): ShortUrl|null
     {
         // When ordering DESC, Postgres puts nulls at the beginning while the rest of supported DB engines put them at
@@ -199,7 +203,13 @@ class ShortUrlRepository extends EntitySpecificationRepository implements ShortU
                ->andWhere($qb->expr()->eq('d.authority', ':authority'))
                ->setParameter('authority', $domain);
         } else {
-            $qb->andWhere($qb->expr()->isNull('s.domain'));
+            $defaultDomain = $this->options->defaultDomain;
+            $qb->leftJoin('s.domain', 'd')
+                ->andWhere($qb->expr()->orX(
+                    $qb->expr()->eq('d.authority', ':authority'),
+                    $qb->expr()->isNull('s.domain'),
+                ))
+                ->setParameter('authority', $defaultDomain);
         }
     }
 }

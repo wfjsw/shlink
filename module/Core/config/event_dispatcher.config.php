@@ -21,9 +21,9 @@ use function Shlinkio\Shlink\Config\runningInRoadRunner;
 
 return (static function (): array {
     $regularEvents = [
-        EventDispatcher\Event\GeoLiteDbCreated::class => [
+        // EventDispatcher\Event\GeoLiteDbCreated::class => [
             EventDispatcher\LocateUnlocatedVisits::class,
-        ],
+        // ],
     ];
     $asyncEvents = [
         EventDispatcher\Event\UrlVisited::class => [
@@ -47,6 +47,8 @@ return (static function (): array {
     }
 
     return [
+
+        'fallback_async_to_regular' => true,
 
         'events' => [
             'regular' => $regularEvents,

@@ -43,10 +43,10 @@ class HealthAction extends AbstractRestAction
         return new JsonResponse([
             'status' => $connected ? self::STATUS_PASS : self::STATUS_FAIL,
             'version' => $this->options->version,
-            'links' => [
-                'about' => 'https://shlink.io',
-                'project' => 'https://github.com/shlinkio/shlink',
-            ],
+            // 'links' => [
+            //     'about' => 'https://shlink.io',
+            //     'project' => 'https://github.com/shlinkio/shlink',
+            // ],
         ], $statusCode, ['Content-type' => self::HEALTH_CONTENT_TYPE]);
     }
 }
