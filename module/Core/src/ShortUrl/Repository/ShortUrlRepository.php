@@ -17,6 +17,7 @@ use Shlinkio\Shlink\Core\ShortUrl\Model\ShortUrlCreation;
 use Shlinkio\Shlink\Core\ShortUrl\Model\ShortUrlIdentifier;
 use Shlinkio\Shlink\Core\ShortUrl\Model\ShortUrlMode;
 use Shlinkio\Shlink\Importer\Model\ImportedShlinkUrl;
+use Shlinkio\Shlink\Core\Config\EnvVars;
 
 use function count;
 use function strtolower;
@@ -24,9 +25,6 @@ use function strtolower;
 /** @extends EntitySpecificationRepository<ShortUrl> */
 class ShortUrlRepository extends EntitySpecificationRepository implements ShortUrlRepositoryInterface
 {
-    public function __construct(private UrlShortenerOptions $options) {
-    }
-
     public function findOneWithDomainFallback(ShortUrlIdentifier $identifier, ShortUrlMode $shortUrlMode): ShortUrl|null
     {
         // When ordering DESC, Postgres puts nulls at the beginning while the rest of supported DB engines put them at
@@ -203,7 +201,7 @@ class ShortUrlRepository extends EntitySpecificationRepository implements ShortU
                ->andWhere($qb->expr()->eq('d.authority', ':authority'))
                ->setParameter('authority', $domain);
         } else {
-            $defaultDomain = $this->options->defaultDomain;
+            $defaultDomain = EnvVars::DEFAULT_DOMAIN->loadFromEnv();
             $qb->leftJoin('s.domain', 'd')
                 ->andWhere($qb->expr()->orX(
                     $qb->expr()->eq('d.authority', ':authority'),
