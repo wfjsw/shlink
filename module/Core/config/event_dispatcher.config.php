@@ -20,17 +20,18 @@ use Shlinkio\Shlink\IpGeolocation\GeoLite2\GeoLite2Options;
 use function Shlinkio\Shlink\Config\runningInRoadRunner;
 
 return (static function (): array {
+    // $regularEvents = [
+    //     EventDispatcher\Event\GeoLiteDbCreated::class => [
+    //         EventDispatcher\LocateUnlocatedVisits::class,
+    //     ],
+    // ];
+    // $asyncEvents = [
     $regularEvents = [
-        // EventDispatcher\Event\GeoLiteDbCreated::class => [
-            EventDispatcher\LocateUnlocatedVisits::class,
-        // ],
-    ];
-    $asyncEvents = [
         EventDispatcher\Event\UrlVisited::class => [
             EventDispatcher\Mercure\NotifyVisitToMercure::class,
             EventDispatcher\RabbitMq\NotifyVisitToRabbitMq::class,
             EventDispatcher\RedisPubSub\NotifyVisitToRedis::class,
-            EventDispatcher\UpdateGeoLiteDb::class,
+            // EventDispatcher\UpdateGeoLiteDb::class,
         ],
         EventDispatcher\Event\ShortUrlCreated::class => [
             EventDispatcher\Mercure\NotifyNewShortUrlToMercure::class,
@@ -38,6 +39,8 @@ return (static function (): array {
             EventDispatcher\RedisPubSub\NotifyNewShortUrlToRedis::class,
         ],
     ];
+
+    $asyncEvents = [];
 
     // Send visits to matomo asynchronously if the runtime allows it
     if (runningInRoadRunner()) {
